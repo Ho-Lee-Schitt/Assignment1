@@ -30,17 +30,26 @@ public class Activity
     public void addActivity(String s)
     {
         theActivities.add(s);
-        System.out.println("Supporter " + s + " entered the taxi");
+        synchronized (System.out)
+        {
+            System.out.println("Supporter " + s + " entered the taxi");
+        }
     }// end addActivity
 
     public void removeActivity(String s)
     {
         if (!theActivities.remove(s))
         {
-            System.out.println("Supporter " + s + " not found");
+            synchronized (System.out)
+            {
+                System.out.println("Supporter " + s + " not found");
+            }
         } else
         {
-            System.out.println("Supporter " + s + " leaving the taxi");
+            synchronized (System.out)
+            {
+                System.out.println("Supporter " + s + " leaving the taxi");
+            }
         }
     }// end removeActivity
 
@@ -54,26 +63,39 @@ public class Activity
                 while (itr.hasNext())
                 {
                     String s = itr.next();
-                    System.out.println("Supporter " + s + " vacated the taxi");
+                    synchronized (System.out)
+                    {
+                        System.out.println("Supporter " + s + " vacated the taxi");
+                    }
                     itr.remove();
                 }
             } else
             {
-                System.out.println("Taxi already empty");
+                synchronized (System.out)
+                {
+                    System.out.println("Taxi already empty");
+                }
             }
         }
-        System.out.println();
+        synchronized (System.out)
+        {
+            System.out.println();
+        }
     }// end removeAllActivities
 
-    public synchronized void printActivities()
+    public void printActivities()
     {
-        System.out.print("SUPPORTERS IN TAXI [ ");
-        for (String s : theActivities)
+        synchronized (System.out)
         {
-            System.out.print(s);
-            System.out.print(" ");
+            System.out.print("SUPPORTERS IN TAXI [ ");
+
+            for (String s : theActivities)
+            {
+                System.out.print(s);
+                System.out.print(" ");
+            }
+            System.out.println("]");
         }
-        System.out.println("]");
     }// end printActivities
 
 }// end Activity

@@ -44,7 +44,6 @@ public class Taxi extends Thread
         while ((numInManuQue.get() != 0) || (numInLivQue.get() != 0))
         {
             taxiFullSem.P();
-            System.out.println("Taxi takes off.");
             taxiActivity.printActivities();
             mutexSem.P();
             // Wait for a bit to simulate the journey
@@ -67,7 +66,6 @@ public class Taxi extends Thread
             pickFromQue.V();
 
             taxiActivity.printActivities();
-            System.out.println("Taxi taking passengers.");
             mutexSem.V();
         }
         System.out.println("No more waiting on Taxi.");

@@ -64,7 +64,6 @@ public class Manu_Supporter extends Thread
             }
         } else
         {
-            System.out.println("Taxi Sent");
             taxiFullSem.V();
         }
         taxiActivity.printActivities();

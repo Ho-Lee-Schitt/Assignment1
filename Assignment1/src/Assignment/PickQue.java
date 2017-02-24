@@ -37,12 +37,8 @@ public class PickQue extends Thread
     {
         while ((numInManuQue.get() != 0) || (numInLivQue.get() != 0))
         {
-            System.out.println("Que Pick");
             pickFromQue.P();
-            System.out.println("Got In");
             mutexSem.P();
-            System.out.println("Manu " + numInManuQue.get());
-            System.out.println("Liv " + numInLivQue.get());
             if (((numInManuQue.get() - manuPassInTaxi.get()) == 0))
             {
                 livPassSem.V();
@@ -54,7 +50,6 @@ public class PickQue extends Thread
             {
                 Random rand = new Random();
                 int r = rand.nextInt(2);
-                System.out.println("r = " + r);
                 if (r == 0)
                 {
                     manuPassSem.V();
