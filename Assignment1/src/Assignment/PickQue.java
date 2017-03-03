@@ -7,7 +7,13 @@ package Assignment;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PickQue extends Thread
+/*
+ * PickQue Class
+ *
+ * Class used to chose who's next to get into taxi in very specific circumstances.
+ */
+
+class PickQue extends Thread
 {
     private AtomicInteger numInManuQue;
     private AtomicInteger numInLivQue;
@@ -19,9 +25,14 @@ public class PickQue extends Thread
     private MageeSemaphore livPassSem;
     private MageeSemaphore mutexSem;
 
-    public PickQue(AtomicInteger numInManuQue, AtomicInteger numInLivQue, AtomicInteger manuPassInTaxi,
-                   AtomicInteger livPassInTaxi, MageeSemaphore pickFromQue, MageeSemaphore manuPassSem,
-                   MageeSemaphore livPassSem, MageeSemaphore mutexSem)
+    PickQue(AtomicInteger numInManuQue,
+            AtomicInteger numInLivQue,
+            AtomicInteger manuPassInTaxi,
+            AtomicInteger livPassInTaxi,
+            MageeSemaphore pickFromQue,
+            MageeSemaphore manuPassSem,
+            MageeSemaphore livPassSem,
+            MageeSemaphore mutexSem)
     {
         this.numInManuQue = numInManuQue;
         this.numInLivQue = numInLivQue;
@@ -38,7 +49,11 @@ public class PickQue extends Thread
         while ((numInManuQue.get() != 0) || (numInLivQue.get() != 0))
         {
             pickFromQue.P();
+
+            // Entering Critical section
             mutexSem.P();
+
+            // Basically catches if the last 2 people in one que are in the taxi.
             if (((numInManuQue.get() - manuPassInTaxi.get()) == 0))
             {
                 livPassSem.V();
@@ -58,6 +73,8 @@ public class PickQue extends Thread
                     livPassSem.V();
                 }
             }
+
+            // Leaving Critical section
             mutexSem.V();
         }
     }

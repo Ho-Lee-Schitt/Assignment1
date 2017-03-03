@@ -4,10 +4,9 @@
 
 package Assignment;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Liv_Supporter extends Thread
+class Liv_Supporter extends Thread
 {
 
     private MageeSemaphore livPassSem;
@@ -19,20 +18,23 @@ public class Liv_Supporter extends Thread
     private AtomicInteger manuPassInTaxi;
     private AtomicInteger livPassInTaxi;
 
-    private AtomicInteger numInLivQue;
-
     private String threadID;
 
     private Activity taxiActivity;
 
-    public Liv_Supporter(int ID, AtomicInteger manuPassInTaxi, AtomicInteger livPassInTaxi, AtomicInteger numInLivQue,
-                         MageeSemaphore livPassSem, MageeSemaphore manuPassSem, MageeSemaphore mutexSem,
-                         MageeSemaphore taxiFullSem, MageeSemaphore pickFromQue, Activity taxiActivity)
+    Liv_Supporter(int ID,
+                         AtomicInteger manuPassInTaxi,
+                         AtomicInteger livPassInTaxi,
+                         MageeSemaphore livPassSem,
+                         MageeSemaphore manuPassSem,
+                         MageeSemaphore mutexSem,
+                         MageeSemaphore taxiFullSem,
+                         MageeSemaphore pickFromQue,
+                         Activity taxiActivity)
     {
         this.threadID = ("Liv_" + ID);
         this.manuPassInTaxi = manuPassInTaxi;
         this.livPassInTaxi = livPassInTaxi;
-        this.numInLivQue = numInLivQue;
         this.livPassSem = livPassSem;
         this.manuPassSem = manuPassSem;
         this.mutexSem = mutexSem;
@@ -43,9 +45,19 @@ public class Liv_Supporter extends Thread
 
     public void run()
     {
+        // Grab Liv supporter semaphore
         livPassSem.P();
+
+        /*
+         * Grab critical mutex
+         * In Critical Section
+         */
         mutexSem.P();
+
+        // Thread LOgged
         taxiActivity.addActivity(threadID);
+
+        // Decide who goes next
         if ((manuPassInTaxi.get() + livPassInTaxi.incrementAndGet()) < 4)
         {
             if (livPassInTaxi.get() == 3)
@@ -63,9 +75,14 @@ public class Liv_Supporter extends Thread
             }
         } else
         {
+            // Taxi full
             taxiFullSem.V();
         }
+
+        // Log Taxi
         taxiActivity.printActivities();
+
+        // Leaving critical section
         mutexSem.V();
     }
 }

@@ -4,14 +4,11 @@
 
 package Assignment;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Taxi extends Thread
+class Taxi extends Thread
 {
     private MageeSemaphore taxiFullSem;
-    private MageeSemaphore manuPassSem;
-    private MageeSemaphore livPassSem;
     private MageeSemaphore mutexSem;
     private MageeSemaphore pickFromQue;
 
@@ -23,16 +20,19 @@ public class Taxi extends Thread
 
     private Activity taxiActivity;
 
-    public Taxi(AtomicInteger manuPassInTaxi, AtomicInteger livPassInTaxi, AtomicInteger numInManuQue,
-                AtomicInteger numInLivQue, MageeSemaphore livPassSem, MageeSemaphore manuPassSem,
-                MageeSemaphore mutexSem, MageeSemaphore taxiFullSem, MageeSemaphore pickFromQue, Activity taxiActivity)
+    Taxi(AtomicInteger manuPassInTaxi,
+                AtomicInteger livPassInTaxi,
+                AtomicInteger numInManuQue,
+                AtomicInteger numInLivQue,
+                MageeSemaphore mutexSem,
+                MageeSemaphore taxiFullSem,
+                MageeSemaphore pickFromQue,
+                Activity taxiActivity)
     {
         this.manuPassInTaxi = manuPassInTaxi;
         this.livPassInTaxi = livPassInTaxi;
         this.numInManuQue = numInManuQue;
         this.numInLivQue = numInLivQue;
-        this.livPassSem = livPassSem;
-        this.manuPassSem = manuPassSem;
         this.mutexSem = mutexSem;
         this.taxiFullSem = taxiFullSem;
         this.pickFromQue = pickFromQue;
@@ -41,14 +41,20 @@ public class Taxi extends Thread
 
     public void run()
     {
+        // While there's people in the Que.
         while ((numInManuQue.get() != 0) || (numInLivQue.get() != 0))
         {
+            // Grab taxi sem
             taxiFullSem.P();
             taxiActivity.printActivities();
+
+            // Entering Critical Section
             mutexSem.P();
+
             // Wait for a bit to simulate the journey
             CDS.idleQuietly(100);
 
+            // Passengers get out
             for (int i = 0; i < manuPassInTaxi.get(); i++)
             {
                 numInManuQue.decrementAndGet();
@@ -58,14 +64,18 @@ public class Taxi extends Thread
                 numInLivQue.decrementAndGet();
             }
 
+            // Clear taxi
             taxiActivity.removeAllActivities();
 
             manuPassInTaxi.set(0);
             livPassInTaxi.set(0);
 
+            // Pick next passenger
             pickFromQue.V();
 
             taxiActivity.printActivities();
+
+            // Leave Critical Section
             mutexSem.V();
         }
         System.out.println("No more waiting on Taxi.");

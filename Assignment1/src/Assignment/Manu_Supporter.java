@@ -4,10 +4,9 @@
 
 package Assignment;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Manu_Supporter extends Thread
+class Manu_Supporter extends Thread
 {
 
     private MageeSemaphore livPassSem;
@@ -19,21 +18,23 @@ public class Manu_Supporter extends Thread
     private AtomicInteger manuPassInTaxi;
     private AtomicInteger livPassInTaxi;
 
-    private AtomicInteger numInManuQue;
-
     private String threadID;
 
     private Activity taxiActivity;
 
-    public Manu_Supporter(int ID, AtomicInteger manuPassInTaxi, AtomicInteger livPassInTaxi,
-                          AtomicInteger numInManuQue, MageeSemaphore livPassSem, MageeSemaphore manuPassSem,
-                          MageeSemaphore mutexSem, MageeSemaphore taxiFullSem, MageeSemaphore pickFromQue,
+    Manu_Supporter(int ID,
+                          AtomicInteger manuPassInTaxi,
+                          AtomicInteger livPassInTaxi,
+                          MageeSemaphore livPassSem,
+                          MageeSemaphore manuPassSem,
+                          MageeSemaphore mutexSem,
+                          MageeSemaphore taxiFullSem,
+                          MageeSemaphore pickFromQue,
                           Activity taxiActivity)
     {
         this.threadID = ("Manu_" + ID);
         this.manuPassInTaxi = manuPassInTaxi;
         this.livPassInTaxi = livPassInTaxi;
-        this.numInManuQue = numInManuQue;
         this.livPassSem = livPassSem;
         this.manuPassSem = manuPassSem;
         this.mutexSem = mutexSem;
@@ -44,9 +45,19 @@ public class Manu_Supporter extends Thread
 
     public void run()
     {
+        // Grab Manu supporter semaphore
         manuPassSem.P();
+
+        /*
+         * Grab critical mutex
+         * In Critical Section
+         */
         mutexSem.P();
+
+        // Thread Logged
         taxiActivity.addActivity(threadID);
+
+        // Decide who goes next
         if ((manuPassInTaxi.incrementAndGet() + livPassInTaxi.get()) < 4)
         {
             if (manuPassInTaxi.get() == 3)
@@ -64,9 +75,14 @@ public class Manu_Supporter extends Thread
             }
         } else
         {
+            // Taxi is ready to roll
             taxiFullSem.V();
         }
+
+        // Print the taxi
         taxiActivity.printActivities();
+
+        // Leave critical section
         mutexSem.V();
     }
 }
