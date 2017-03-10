@@ -8,25 +8,41 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Question2
 {
+    // Declare variables
+    final static int MANU_PASSENGERS = 12;
+    final static int LIV_PASSENGERS = 12;
+    static AtomicInteger manuPassInTaxi;
+    static AtomicInteger livPassInTaxi;
+
+    static AtomicInteger numInManuQue;
+    static AtomicInteger numInLivQue;
+
+    // Declare Semaphores
+    static MageeSemaphore mutexSem;
+
+    static MageeSemaphore manuPassSem;
+    static MageeSemaphore livPassSem ;
+
+    static MageeSemaphore taxiFullSem;
+    static MageeSemaphore pickFromQue;
+
     public static void main(String[] args)
     {
         // Define variables
-        final int MANU_PASSENGERS = 12;
-        final int LIV_PASSENGERS = 12;
-        AtomicInteger manuPassInTaxi = new AtomicInteger();
-        AtomicInteger livPassInTaxi = new AtomicInteger();
+        manuPassInTaxi = new AtomicInteger();
+        livPassInTaxi = new AtomicInteger();
 
-        AtomicInteger numInManuQue = new AtomicInteger(MANU_PASSENGERS);
-        AtomicInteger numInLivQue = new AtomicInteger(LIV_PASSENGERS);
+        numInManuQue = new AtomicInteger(MANU_PASSENGERS);
+        numInLivQue = new AtomicInteger(LIV_PASSENGERS);
 
         // Define Semaphores
-        MageeSemaphore mutexSem = new MageeSemaphore(1);
+        mutexSem = new MageeSemaphore(1);
 
-        MageeSemaphore manuPassSem = new MageeSemaphore(0);
-        MageeSemaphore livPassSem = new MageeSemaphore(0);
+        manuPassSem = new MageeSemaphore(0);
+        livPassSem = new MageeSemaphore(0);
 
-        MageeSemaphore taxiFullSem = new MageeSemaphore(0);
-        MageeSemaphore pickFromQue = new MageeSemaphore(1);
+        taxiFullSem = new MageeSemaphore(0);
+        pickFromQue = new MageeSemaphore(1);
 
         // Create Taxi Logger
         Activity taxiActivity = new Activity();

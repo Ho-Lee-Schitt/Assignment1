@@ -63,18 +63,12 @@ public class Activity
                 while (itr.hasNext())
                 {
                     String s = itr.next();
-                    synchronized (System.out)
-                    {
                         System.out.println("Supporter " + s + " vacated the taxi");
-                    }
                     itr.remove();
                 }
             } else
             {
-                synchronized (System.out)
-                {
                     System.out.println("Taxi already empty");
-                }
             }
         }
         synchronized (System.out)
